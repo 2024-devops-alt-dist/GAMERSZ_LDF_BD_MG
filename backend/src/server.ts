@@ -37,16 +37,22 @@ app.get("/health", async (req, res) => {
 			.ping()
 			.then(() => "connected")
 			.catch(() => "disconnected");
+
 		res.json({
 			status: "ok",
 			timestamp: new Date().toISOString(),
 			database: dbStatus,
 		});
 	} catch (error) {
-		res.json({
-			status: "ok",
+		// Changed status to error when there's an exception
+		res.status(503).json({
+			status: "error",
 			timestamp: new Date().toISOString(),
 			database: "error",
+			message:
+				error instanceof Error
+					? error.message
+					: "Unknown database error",
 		});
 	}
 });
