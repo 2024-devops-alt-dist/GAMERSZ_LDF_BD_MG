@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import { connectToDatabase, client } from "./config/database";
 
 // Load environment variables
@@ -26,6 +27,18 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
+
+// CORS avec support des cookies
+app.use(
+	cors({
+	  origin: "http://localhost:3000", // Remplace par l'URL de ton frontend
+	  credentials: true, // Autorise l'envoi des cookies
+	})
+  );
+  
+  app.listen(5000, () => console.log("Server running on port 5000"));
+  
 
 // Basic health check route with MongoDB status
 app.get("/health", async (req, res) => {
