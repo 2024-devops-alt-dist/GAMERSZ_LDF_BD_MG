@@ -22,8 +22,8 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import { ChatRoomSchema } from "../models/ChatRoom";
 
-// Initialize ChatRoom model with "gamerz" collection
-const ChatRoom = mongoose.model("ChatRoom", ChatRoomSchema, "gamerz");
+// Initialize ChatRoom model
+const ChatRoom = mongoose.model("ChatRoom", ChatRoomSchema);
 
 /**
  * Get all chatrooms
