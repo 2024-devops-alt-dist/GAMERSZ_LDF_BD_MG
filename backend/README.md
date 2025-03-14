@@ -61,7 +61,6 @@ backend/
 │   │   ├── auth.ts        # Authentication routes
 │   │   └── chatrooms.ts   # Chatroom routes
 │   ├── scripts/           # Utility scripts
-│   │   └── seed.ts        # Database seeding script
 │   ├── types/             # TypeScript type definitions
 │   │   └── jwt.d.ts       # JWT payload type definition
 │   └── utils/             # Utility functions
@@ -77,8 +76,6 @@ backend/
 - **server.ts**: The main entry point that imports the app from app.ts, connects to MongoDB, and starts the server. It also handles graceful shutdown and defines the health check endpoint.
 
 - **config/database.ts**: Handles the MongoDB connection setup for both the native MongoDB driver and Mongoose ODM.
-
-- **scripts/seed.ts**: A utility script to initialize the database with test data for development and testing.
 
 ## API Endpoints
 
@@ -233,28 +230,19 @@ Note: This requires `jq` to be installed for JSON parsing.
    JWT_EXPIRY=24h
    ```
 
-4. Seed the database with initial data (optional)
-
-   ```bash
-   npm run seed
-   ```
-
-   This will create an admin user, a test player, and some test chatrooms.
-
-5. Start the development server
+4. Start the development server
 
    ```bash
    npm run dev
    ```
 
-6. The server will be running at http://localhost:3000
+5. The server will be running at http://localhost:3000
 
 ## Development Scripts
 
 - `npm run dev` - Start the development server with hot reloading
 - `npm run build` - Build the TypeScript code
 - `npm start` - Start the production server
-- `npm run seed` - Seed the database with initial data
 
 ## License
 
