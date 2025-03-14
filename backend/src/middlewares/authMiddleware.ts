@@ -40,7 +40,6 @@ export const authenticateUser = (
 
 	try {
 		// Verify token and attach user to request
-		// @ts-ignore - Ignoring type checking for jwt.verify
 		const decoded = jwt.verify(token, JWT_SECRET);
 		req.user = decoded;
 		next();
