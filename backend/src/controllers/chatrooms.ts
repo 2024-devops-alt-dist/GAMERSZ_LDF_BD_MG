@@ -2,24 +2,19 @@
  * ChatRoom Controller
  *
  * This file contains controllers for chatroom-related operations:
- * - getAllChatRooms: Retrieves a list of all chatrooms
- * - getChatRoomById: Retrieves a single chatroom by ID
+ * - getAllChatRooms: Retrieves a list of all chatrooms (public access)
+ * - getChatRoomById: Retrieves a single chatroom by ID (requires authentication)
  *
  * Test with curl:
  *
  * Get all chatrooms:
  * ```
- * curl -H "Cookie: token=YOUR_JWT_TOKEN" http://localhost:3000/api/chatrooms
+ * curl http://localhost:3000/api/chatrooms
  * ```
  *
  * Get a single chatroom:
  * ```
  * curl -H "Cookie: token=YOUR_JWT_TOKEN" http://localhost:3000/api/chatrooms/CHATROOM_ID
- * ```
- *
- * Alternative using Authorization header:
- * ```
- * curl -H "Authorization: Bearer YOUR_JWT_TOKEN" http://localhost:3000/api/chatrooms
  * ```
  */
 
@@ -34,19 +29,14 @@ const ChatRoom = mongoose.model("ChatRoom", ChatRoomSchema);
  * Get all chatrooms
  *
  * Retrieves a list of all chatrooms, sorted by name.
- * This endpoint is accessible to all authenticated users, including those with pending status.
+ * This endpoint is publicly accessible without authentication.
  *
  * @param req Request object
  * @param res Response object
  *
  * Test with curl:
  * ```
- * curl -H "Cookie: token=YOUR_JWT_TOKEN" http://localhost:3000/api/chatrooms
- * ```
- *
- * Or using the token from login (saved in cookies.txt):
- * ```
- * curl -b cookies.txt http://localhost:3000/api/chatrooms
+ * curl http://localhost:3000/api/chatrooms
  * ```
  */
 export const getAllChatRooms = async (
@@ -74,7 +64,7 @@ export const getAllChatRooms = async (
  * Get a single chatroom by ID
  *
  * Retrieves a single chatroom by its MongoDB ObjectId.
- * This endpoint is accessible to all authenticated users, including those with pending status.
+ * This endpoint requires authentication to access.
  *
  * @param req Request object containing the chatroom ID in params
  * @param res Response object

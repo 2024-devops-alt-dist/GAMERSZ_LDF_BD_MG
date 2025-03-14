@@ -2,8 +2,8 @@
  * ChatRoom Routes
  *
  * This file defines the routes for chatroom operations:
- * - GET /: Get all chatrooms
- * - GET /:id: Get a single chatroom by ID
+ * - GET /: Get all chatrooms (public access)
+ * - GET /:id: Get a single chatroom by ID (requires authentication)
  *
  * Future routes (commented out):
  * - POST /:id/join: Join a chatroom (requires approved status)
@@ -14,7 +14,7 @@
  *
  * Get all chatrooms:
  * ```
- * curl -H "Cookie: token=YOUR_JWT_TOKEN" http://localhost:3000/api/chatrooms
+ * curl http://localhost:3000/api/chatrooms
  * ```
  *
  * Get a single chatroom:
@@ -24,7 +24,6 @@
  *
  * Using cookies from login:
  * ```
- * curl -b cookies.txt http://localhost:3000/api/chatrooms
  * curl -b cookies.txt http://localhost:3000/api/chatrooms/CHATROOM_ID
  * ```
  */
@@ -43,25 +42,26 @@ import {
 const router: Router = express.Router();
 
 /**
- * Authentication Middleware
+ * Public Chatroom Routes
  *
- * Apply basic authentication middleware to all chatroom routes.
- * This allows any registered user to view chatrooms, regardless of their status.
- */
-router.use(authenticateUser as RequestHandler);
-
-/**
- * Chatroom Routes for Viewing
- *
- * These routes are accessible to all authenticated users, including those with pending status.
- * They allow users to view chatrooms but not interact with them.
+ * The route for listing all chatrooms is publicly accessible without authentication.
  */
 
-// Get all chatrooms
+// Get all chatrooms (public access)
 router.get("/", getAllChatRooms as RequestHandler);
 
-// Get a single chatroom by ID
-router.get("/:id", getChatRoomById as RequestHandler);
+/**
+ * Protected Chatroom Routes
+ *
+ * These routes require authentication to access.
+ */
+
+// Get a single chatroom by ID (requires authentication)
+router.get(
+	"/:id",
+	authenticateUser as RequestHandler,
+	getChatRoomById as RequestHandler
+);
 
 /**
  * Future Routes for Chatroom Interaction
