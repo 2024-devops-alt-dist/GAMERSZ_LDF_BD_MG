@@ -35,8 +35,8 @@ import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import { UserSchema } from "../models/User";
 
-// Initialize User model
-const User = mongoose.model("User", UserSchema);
+// Initialize User model with "gamerz" collection
+const User = mongoose.model("User", UserSchema, "gamerz");
 
 // Get JWT configuration from environment variables or use defaults
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
