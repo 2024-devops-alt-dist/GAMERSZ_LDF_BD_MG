@@ -24,7 +24,7 @@ if (!username || !password) {
 }
 
 // Construct MongoDB connection URI
-const uri = `mongodb+srv://${username}:${password}@gamerz-ldf-bd-mg.xaqey.mongodb.net/?retryWrites=true&w=majority&appName=Gamerz-ldf-bd-mg`;
+const uri = `mongodb+srv://${username}:${password}@gamerz-ldf-bd-mg.xaqey.mongodb.net/gamerz?retryWrites=true&w=majority&appName=Gamerz-ldf-bd-mg`;
 
 // Create MongoDB client instance with optimized settings
 export const client = new MongoClient(uri, {
