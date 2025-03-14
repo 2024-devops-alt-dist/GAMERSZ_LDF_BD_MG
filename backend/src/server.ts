@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import { connectToDatabase, client } from "./config/database";
+import authRoutes from "./routes/authRoutes";
 
 // Load environment variables
 dotenv.config();
@@ -23,11 +24,18 @@ console.log("─".repeat(30), "\n");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+
+
+// Middleware pour utiliser les routes d'authentification
+app.use("/auth", authRoutes);
+
 
 // CORS avec support des cookies
 app.use(
