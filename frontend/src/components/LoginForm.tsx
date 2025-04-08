@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/auth-context';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -8,6 +9,7 @@ const LoginForm = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +36,13 @@ const LoginForm = () => {
       if (!response.ok) {
         throw new Error(data.message || 'Something went wrong');
       }
+      login({
+        email: data.user.email,
+        username: data.user.username,
+        role: data.user.role,
+        status: data.user.status,
+        photoUrl: data.user.photoUrl,
+      });
       console.log('Login successful:', data);
 
       navigate('/');
