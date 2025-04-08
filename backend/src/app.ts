@@ -10,14 +10,14 @@
  * - server.ts handles server startup, database connection, and graceful shutdown
  */
 
-import express from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv';
 
 // Import routes
-import authRoutes from "./routes/auth";
-import chatroomRoutes from "./routes/chatrooms";
+import authRoutes from './routes/auth';
+import chatroomRoutes from './routes/chatrooms';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -46,7 +46,12 @@ const app = express();
  * from different domains. This is essential for frontend applications
  * hosted on different domains to interact with the API.
  */
-app.use(cors());
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  })
+);
 
 /**
  * JSON Body Parser Middleware
@@ -84,7 +89,7 @@ app.use(cookieParser());
  * Handles user registration, login, and logout.
  * Base path: /api/auth
  */
-app.use("/api/auth", authRoutes);
+app.use('/api/auth', authRoutes);
 
 /**
  * Chatroom Routes
@@ -92,7 +97,7 @@ app.use("/api/auth", authRoutes);
  * Base path: /api/chatrooms
  * These routes are protected by authentication middleware.
  */
-app.use("/api/chatrooms", chatroomRoutes);
+app.use('/api/chatrooms', chatroomRoutes);
 
 // Note: Health check endpoint is defined in server.ts
 
