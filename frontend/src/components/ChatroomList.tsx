@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Chatroom } from "../types/Chatroom";
 import { ENDPOINTS } from "../config/api";
-import { useAuth } from "../context/auth-context";
+import { useAuth } from "../hooks/useAuth";
 
 export const ChatroomList: React.FC = () => {
 	const [chatrooms, setChatrooms] = useState<Chatroom[]>([]);

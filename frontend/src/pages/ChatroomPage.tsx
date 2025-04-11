@@ -3,13 +3,8 @@ import { useParams } from "react-router-dom";
 import { ENDPOINTS } from "../config/api";
 import type { Chatroom } from "../types/Chatroom";
 import type { Message } from "../types/Message";
-import { useAuth } from "../context/auth-context";
+import { useAuth } from "../hooks/useAuth";
 import { FaPaperPlane } from "react-icons/fa";
-
-// Helper function to get the user ID from a message
-const getUserIdFromMessage = (message: Message): string => {
-	return message.senderId;
-};
 
 // API response types
 interface ChatroomApiResponse {
@@ -188,6 +183,16 @@ const ChatroomPage: React.FC = () => {
 		);
 	}
 
+	// Check if the current user is the sender of a message
+	const isCurrentUser = (message: Message): boolean => {
+		// Since user no longer has _id property, compare by username or email
+		if (!user) return false;
+		
+		// Get the user details from the message sender ID
+		// This is a simplified approach - in a real app, you might want to fetch user details
+		return user.email === message.senderId || user.username === message.senderId;
+	};
+
 	return (
 		<div className="flex flex-col min-h-screen bg-gray-900 text-white">
 			{/* Chatroom Header */}
@@ -209,20 +214,20 @@ const ChatroomPage: React.FC = () => {
 						<div
 							key={message._id}
 							className={`flex ${
-								getUserIdFromMessage(message) === user?._id
+								isCurrentUser(message)
 									? "justify-end"
 									: "justify-start"
 							}`}
 						>
 							<div
 								className={`max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl rounded-lg px-4 py-2 ${
-									getUserIdFromMessage(message) === user?._id
+									isCurrentUser(message)
 										? "bg-primary text-white"
 										: "bg-gray-800 border border-gray-700 text-gray-100"
 								}`}
 							>
 								<div className="font-bold text-sm">
-									{getUserIdFromMessage(message) === user?._id
+									{isCurrentUser(message)
 										? "You"
 										: "User"}
 								</div>
