@@ -5,6 +5,7 @@
  * - POST /register: Register a new user
  * - POST /login: Authenticate a user and issue a JWT token
  * - POST /logout: Clear the authentication cookie
+ * - POST /auth/me: Get the current authenticated user
  *
  * Test with curl:
  *
@@ -29,8 +30,8 @@
  * ```
  */
 
-import express, { Router, RequestHandler } from "express";
-import { login, register, logout } from "../controllers/auth";
+import express, { Router, RequestHandler } from 'express';
+import { login, register, logout, currentUser } from '../controllers/auth';
 
 // Create a router instance
 const router: Router = express.Router();
@@ -42,12 +43,15 @@ const router: Router = express.Router();
  */
 
 // Register a new user
-router.post("/register", register as RequestHandler);
+router.post('/register', register as RequestHandler);
 
 // Login a user
-router.post("/login", login as RequestHandler);
+router.post('/login', login as RequestHandler);
 
 // Logout a user
-router.post("/logout", logout as RequestHandler);
+router.post('/logout', logout as RequestHandler);
+
+// Get the current authenticated user
+router.get('/me', currentUser as RequestHandler);
 
 export default router;
