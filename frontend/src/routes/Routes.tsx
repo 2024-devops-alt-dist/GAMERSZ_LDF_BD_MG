@@ -1,13 +1,19 @@
 import { Route, Routes } from "react-router-dom";
 
+
 import LoginPage from "../pages/Login";
 import Homepage from "../pages/Homepage";
 import ChatroomPage from "../pages/ChatroomPage";
+import SignupPage from '../pages/Signup';
 import React from "react";
 
 const Router: React.FC = () => {
 	return (
 		<Routes>
+      <Route
+				path="/register"
+				element={<SignupPage />}
+			/>
 			<Route
 				path="/"
 				element={<Homepage />}
