@@ -1,4 +1,4 @@
-import { createContext } from 'react';
+import { createContext } from "react";
 
 export interface User {
   _id: string;
@@ -9,12 +9,12 @@ export interface User {
   photoUrl: string;
 }
 interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
-  login: (user: User) => void;
-  logout: () => void;
+	user: User | null;
+	isAuthenticated: boolean;
+	login: (user: User) => void;
+	logout: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
-  undefined
+	undefined
 );
