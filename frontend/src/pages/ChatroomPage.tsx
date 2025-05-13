@@ -4,6 +4,8 @@ import { ENDPOINTS } from "../config/api";
 import type { Chatroom } from "../types/Chatroom";
 import type { Message } from "../types/Message";
 import { useAuth } from "../hooks/useAuth";
+import { useSocket } from "../hooks/useSocket";
+import { SocketEvents } from "../types/SocketEvents";
 
 // API response types
 interface ChatroomApiResponse {
@@ -25,6 +27,8 @@ const ChatroomPage: React.FC = () => {
 	const [error, setError] = useState<string | null>(null);
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const { user } = useAuth();
+	const { socket, isConnected, joinRoom, leaveRoom, sendMessage } =
+		useSocket();
 
 	// Scroll to bottom when messages change
 	const scrollToBottom = () => {
@@ -39,18 +43,59 @@ const ChatroomPage: React.FC = () => {
 	};
 
 	// Handle message submission
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (newMessage.trim() && id) {
-			// TODO: Socket.IO will be implemented later
-			// For now, just clear the input
-			setNewMessage("");
+		if (newMessage.trim() && id && user) {
+			// Check if user is approved
+			if (user.status !== "approved") {
+				alert(
+					"Your account is pending approval. You can view chatrooms but cannot send messages yet."
+				);
+				return;
+			}
 
-			// Show a message that Socket.IO is not implemented yet
-			alert(
-				"Socket.IO messaging will be implemented later. Your message: " +
-					newMessage
-			);
+			// Log socket state before sending message
+			console.log("Before sending message - Socket state:", {
+				socket,
+				isConnected,
+				user,
+				roomId: id,
+				message: newMessage.trim()
+			});
+
+			// Check if socket is connected
+			if (!isConnected) {
+				console.warn("Socket is not connected. Attempting to connect...");
+				if (socket) {
+					socket.connect();
+					alert("Reconnecting to chat server. Please try sending your message again in a moment.");
+					return;
+				}
+			}
+
+			try {
+				// Send message via Socket.IO and save to database
+				await sendMessage(id, newMessage.trim());
+
+				// Clear the input field
+				setNewMessage("");
+				console.log("Message sent successfully");
+			} catch (error) {
+				console.error("Error sending message:", error);
+				// Log more detailed error information
+				if (error instanceof Error) {
+					console.error("Error details:", {
+						name: error.name,
+						message: error.message,
+						stack: error.stack
+					});
+				}
+				alert(
+					error instanceof Error
+						? error.message
+						: "Failed to send message"
+				);
+			}
 		}
 	};
 
@@ -170,6 +215,71 @@ const ChatroomPage: React.FC = () => {
 		scrollToBottom();
 	}, [messages]);
 
+	// Join the chatroom when the component mounts and leave when it unmounts
+	useEffect(() => {
+		if (import.meta.env.MODE !== "production") {
+			console.log("ChatRoomPage: Socket state", {
+				socket,
+				isConnected,
+				user,
+			});
+		}
+		
+		// Check if socket exists but is not connected
+		if (id && socket && !isConnected) {
+			console.warn("Socket exists but is not connected. Attempting to connect...");
+			// Try to manually connect the socket
+			socket.connect();
+			
+			// Return early to wait for the connection to be established
+			// The effect will run again when isConnected changes
+			return;
+		}
+		
+		if (id && socket && isConnected) {
+			console.log("Socket is connected, attempting to join room");
+			// Check if user is approved before joining the room
+			if (user && user.status === "approved") {
+				// Join the chatroom
+				joinRoom(id);
+				if (import.meta.env.MODE !== "production") {
+					console.log(`Joined chatroom: ${id}`);
+				}
+			} else {
+				if (import.meta.env.MODE !== "production") {
+					console.log(
+						"User not approved, can view but not join chatroom"
+					);
+				}
+			}
+
+			// Listen for new messages (all users can receive messages)
+			socket.on(SocketEvents.NEW_MESSAGE, (message: Message) => {
+				// Only add the message if it's for this chatroom
+				if (message.roomId === id) {
+					if (import.meta.env.MODE !== "production") {
+						console.log("Received new message:", message);
+					}
+					setMessages((prevMessages) => [...prevMessages, message]);
+				}
+			});
+
+			// Clean up when the component unmounts
+			return () => {
+				// Leave the chatroom if user was approved
+				if (user && user.status === "approved") {
+					leaveRoom(id);
+					if (import.meta.env.MODE !== "production") {
+						console.log(`Left chatroom: ${id}`);
+					}
+				}
+
+				// Remove the event listener
+				socket.off(SocketEvents.NEW_MESSAGE);
+			};
+		}
+	}, [id, user, socket, isConnected, joinRoom, leaveRoom]);
+
 	if (isLoading) {
 		return (
 			<div className="flex justify-center items-center min-h-screen bg-gray-900">
@@ -210,6 +320,7 @@ const ChatroomPage: React.FC = () => {
 		// Get the user details from the message sender ID
 		// This is a simplified approach - in a real app, you might want to fetch user details
 		return (
+			user._id === message.senderId ||
 			user.email === message.senderId ||
 			user.username === message.senderId
 		);

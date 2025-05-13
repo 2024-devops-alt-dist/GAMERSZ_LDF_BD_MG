@@ -19,6 +19,7 @@ const LoginForm = () => {
 		}
 		setLoading(true);
 		try {
+			console.log("Attempting login with:", { email });
 			const response = await fetch(
 				"http://localhost:3000/api/auth/login",
 				{
@@ -35,24 +36,50 @@ const LoginForm = () => {
 			);
 
 			const data = await response.json();
+			console.log("Login response:", data);
 
 			if (!response.ok) {
 				throw new Error(data.message || "Something went wrong");
 			}
-			login({
-				_id: data.user._id,
+
+			// Check if user data exists in the response
+			if (!data.user) {
+				throw new Error("Invalid user data received from server");
+			}
+
+			// The backend returns 'id' but our User type expects '_id'
+			if (!data.user._id && !data.user.id) {
+				console.error(
+					"Neither _id nor id found in user data:",
+					data.user
+				);
+				throw new Error("User ID not found in response");
+			}
+
+			// Log the user in
+			const userData = {
+				_id: data.user._id || data.user.id, // Handle both _id and id
 				email: data.user.email,
 				username: data.user.username,
 				role: data.user.role,
 				status: data.user.status,
 				photoUrl:
 					data.user.photoUrl || "https://via.placeholder.com/150",
-			});
-			console.log("Login successful:", data);
+			};
 
+			console.log("Login successful, setting user data:", userData);
+
+			// First set the user data in the auth context
+			login(userData);
+
+			console.log("Redirecting to home page...");
+
+			// Use React Router's navigate for client-side navigation
 			navigate("/");
+
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (err: any) {
+			console.error("Login error:", err);
 			setError(err.message);
 		} finally {
 			setLoading(false);
@@ -118,12 +145,12 @@ const LoginForm = () => {
 				</div>
 
 				<div className="text-center">
-					<a
-						href="#"
+					<Link
+						to="/forgot-password"
 						className="text-sm text-blue-500 hover:underline"
 					>
 						Forgot password?
-					</a>
+					</Link>
 				</div>
 
 				<div className="text-center mt-4">
