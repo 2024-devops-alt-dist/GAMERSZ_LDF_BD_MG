@@ -2,7 +2,7 @@
 
 This is a **modern frontend** project built with [Vite](https://vitejs.dev/), [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), and [TailwindCSS](https://tailwindcss.com/), featuring routing via `react-router-dom` and styled components using `daisyUI`.
 
-## 📦 Tech Stack & Dependencies
+## 📦 Tech Stack & Dependencies.
 
 - **Vite** – Fast build tool and development server.
 - **React 19** – Component-based UI library.
