@@ -145,8 +145,8 @@ const SignupForm: React.FC = () => {
 	};
 
 	return (
-		<div className="min-h-screen flex justify-center items-center bg-base-200 p-6">
-			<div className="w-full max-w-lg p-8 bg-white shadow-2xl rounded-xl space-y-6">
+		<div className="flex justify-center items-start bg-base-200 p-0 pt-3">
+			<div className="w-full max-w-lg p-8 bg-white shadow-2xl rounded-xl space-y-6 mt-0">
 				<h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
 					Join our gaming community!
 				</h1>

@@ -1,11 +1,9 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { ENDPOINTS } from "../config/api";
 import type { Chatroom } from "../types/Chatroom";
 import type { Message } from "../types/Message";
 import { useAuth } from "../hooks/useAuth";
-import { FaPaperPlane } from "react-icons/fa";
 
 // API response types
 interface ChatroomApiResponse {
@@ -34,7 +32,9 @@ const ChatroomPage: React.FC = () => {
 	};
 
 	// Handle message input change
-	const handleMessageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleMessageChange = (
+		e: React.ChangeEvent<HTMLInputElement>
+	) => {
 		setNewMessage(e.target.value);
 	};
 
@@ -45,9 +45,12 @@ const ChatroomPage: React.FC = () => {
 			// TODO: Socket.IO will be implemented later
 			// For now, just clear the input
 			setNewMessage("");
-			
+
 			// Show a message that Socket.IO is not implemented yet
-			alert("Socket.IO messaging will be implemented later. Your message: " + newMessage);
+			alert(
+				"Socket.IO messaging will be implemented later. Your message: " +
+					newMessage
+			);
 		}
 	};
 
@@ -59,7 +62,7 @@ const ChatroomPage: React.FC = () => {
 
 				// Fetch chatroom details using the ENDPOINTS from config
 				const chatroomUrl = ENDPOINTS.CHATROOM(id);
-				
+
 				const chatroomResponse = await fetch(chatroomUrl, {
 					credentials: "include",
 					headers: {
@@ -70,37 +73,50 @@ const ChatroomPage: React.FC = () => {
 				if (!chatroomResponse.ok) {
 					const errorText = await chatroomResponse.text();
 					console.error("Chatroom fetch error:", errorText);
-					
+
 					// If we get a 404, try to fetch the chatroom list and find the matching chatroom
 					if (chatroomResponse.status === 404) {
-						console.log("Chatroom not found, trying to fetch from chatroom list");
-						const chatroomsResponse = await fetch(ENDPOINTS.CHATROOMS, {
-							credentials: "include",
-							headers: {
-								"Content-Type": "application/json"
+						console.log(
+							"Chatroom not found, trying to fetch from chatroom list"
+						);
+						const chatroomsResponse = await fetch(
+							ENDPOINTS.CHATROOMS,
+							{
+								credentials: "include",
+								headers: {
+									"Content-Type": "application/json",
+								},
 							}
-						});
-						
+						);
+
 						if (chatroomsResponse.ok) {
 							const chatroomsData = await chatroomsResponse.json();
-							
+
 							// Find a chatroom with a matching ID or similar ID
-							const matchingChatroom = chatroomsData.data.find((room: Chatroom) => 
-								room._id === id || room._id.includes(id) || id.includes(room._id)
+							const matchingChatroom = chatroomsData.data.find(
+								(room: Chatroom) =>
+									room._id === id ||
+									room._id.includes(id) ||
+									id.includes(room._id)
 							);
-							
+
 							if (matchingChatroom) {
-								console.log("Found matching chatroom:", matchingChatroom);
+								console.log(
+									"Found matching chatroom:",
+									matchingChatroom
+								);
 								setChatroom(matchingChatroom);
-								
+
 								// Now fetch messages for this chatroom
 								await fetchMessages(matchingChatroom._id);
 								return; // Skip the error
 							}
 						}
 					}
-					
-					throw new Error(`Failed to fetch chatroom: ${chatroomResponse.status} ${errorText}`);
+
+					throw new Error(
+						`Failed to fetch chatroom: ${chatroomResponse.status} ${errorText}`
+					);
 				}
 
 				const chatroomData: ChatroomApiResponse =
@@ -122,22 +138,24 @@ const ChatroomPage: React.FC = () => {
 		const fetchMessages = async (chatroomId: string) => {
 			try {
 				const messagesUrl = ENDPOINTS.MESSAGES(chatroomId);
-				
+
 				const messagesResponse = await fetch(messagesUrl, {
 					credentials: "include",
 					headers: {
 						"Content-Type": "application/json",
 					},
 				});
-				
+
 				if (!messagesResponse.ok) {
 					const errorText = await messagesResponse.text();
-					throw new Error(`Failed to fetch messages: ${messagesResponse.status} ${errorText}`);
+					throw new Error(
+						`Failed to fetch messages: ${messagesResponse.status} ${errorText}`
+					);
 				}
 
 				const messagesData: MessagesApiResponse =
 					await messagesResponse.json();
-				
+
 				setMessages(messagesData.data);
 			} catch (error) {
 				console.error("Error fetching messages:", error);
@@ -188,17 +206,22 @@ const ChatroomPage: React.FC = () => {
 	const isCurrentUser = (message: Message): boolean => {
 		// Since user no longer has _id property, compare by username or email
 		if (!user) return false;
-		
+
 		// Get the user details from the message sender ID
 		// This is a simplified approach - in a real app, you might want to fetch user details
-		return user.email === message.senderId || user.username === message.senderId;
+		return (
+			user.email === message.senderId ||
+			user.username === message.senderId
+		);
 	};
 
 	return (
 		<div className="flex flex-col min-h-screen bg-gray-900 text-white">
 			{/* Chatroom Header */}
 			<div className="bg-gray-800 shadow p-4 flex items-center">
-				<h1 className="text-xl font-bold text-white">{chatroom.name}</h1>
+				<h1 className="text-xl font-bold text-white">
+					{chatroom.name}
+				</h1>
 				<span className="ml-2 text-sm text-gray-300 bg-gray-700 px-2 py-1 rounded">
 					{chatroom.game}
 				</span>
@@ -228,15 +251,11 @@ const ChatroomPage: React.FC = () => {
 								}`}
 							>
 								<div className="font-bold text-sm">
-									{isCurrentUser(message)
-										? "You"
-										: "User"}
+									{isCurrentUser(message) ? "You" : "User"}
 								</div>
 								<div className="mt-1">{message.content}</div>
 								<div className="text-xs opacity-75 text-right mt-1">
-									{new Date(
-										message.createdAt
-									).toLocaleTimeString()}
+									{new Date(message.createdAt).toLocaleTimeString()}
 								</div>
 							</div>
 						</div>
@@ -263,7 +282,7 @@ const ChatroomPage: React.FC = () => {
 						disabled={!newMessage.trim()}
 						className="bg-primary text-white rounded-full p-2 hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
 					>
-						<FaPaperPlane className="h-5 w-5" />
+						Send
 					</button>
 				</form>
 			</div>
