@@ -29,9 +29,18 @@ export const authenticateUser = (
 	next: NextFunction
 ) => {
 	// Get token from cookies or Authorization header
-	const token =
-		req.cookies.token ||
-		req.header("Authorization")?.replace("Bearer ", "");
+	let token = req.cookies.token;
+
+	// If no token in cookies, check Authorization header
+	if (!token) {
+		const authHeader = req.header("Authorization");
+		if (authHeader && authHeader.startsWith("Bearer ")) {
+			token = authHeader.replace("Bearer ", "");
+			console.log("Using token from Authorization header");
+		}
+	} else {
+		console.log("Using token from cookies");
+	}
 
 	// Check if token exists
 	if (!token) {
@@ -42,8 +51,14 @@ export const authenticateUser = (
 		// Verify token and attach user to request
 		const decoded = jwt.verify(token, JWT_SECRET);
 		req.user = decoded;
+		console.log("User authenticated:", {
+			userId: (decoded as any).userId,
+			username: (decoded as any).username,
+			status: (decoded as any).status,
+		});
 		next();
 	} catch (error) {
+		console.error("Token verification failed:", error);
 		return res.status(401).json({ message: "Invalid token" });
 	}
 };
@@ -59,18 +74,30 @@ export const requireApprovedUser = (
 ) => {
 	// First ensure the user is authenticated
 	if (!req.user) {
+		console.error("requireApprovedUser: No user found in request");
 		return res
 			.status(401)
 			.json({ message: "Authentication required" });
 	}
 
+	console.log("requireApprovedUser: Checking user status", {
+		userId: req.user.userId,
+		username: req.user.username,
+		status: req.user.status,
+	});
+
 	// Then check if the user is approved
 	if (req.user.status !== "approved") {
+		console.error("requireApprovedUser: User not approved", {
+			userId: req.user.userId,
+			status: req.user.status,
+		});
 		return res.status(403).json({
 			message: "Your account must be approved to perform this action",
 		});
 	}
 
+	console.log("requireApprovedUser: User approved, proceeding");
 	next();
 };
 

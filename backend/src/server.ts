@@ -48,6 +48,8 @@
 import dotenv from "dotenv";
 import { connectToDatabase, client } from "./config/database";
 import app from "./app";
+import http from "http";
+import { initializeSocketIO } from "./utils/socket";
 
 /**
  * Load environment variables from .env file
@@ -156,10 +158,16 @@ async function startServer() {
 		await connectToDatabase();
 
 		/**
-		 * Start the HTTP server
-		 * This starts listening for incoming HTTP requests on the specified port
+		 * Create HTTP server and initialize Socket.IO
+		 * This creates an HTTP server from the Express app and initializes Socket.IO
 		 */
-		const server = app.listen(PORT, () => {
+		const httpServer = http.createServer(app);
+
+		// Initialize Socket.IO
+		const io = initializeSocketIO(httpServer);
+
+		// Start the HTTP server
+		const server = httpServer.listen(PORT, () => {
 			console.log(`🚀 Server is running at http://localhost:${PORT}`);
 			console.log(`  - curl http://localhost:${PORT}/health`);
 			console.log(`  - API endpoints available at:`);
@@ -168,6 +176,7 @@ async function startServer() {
 			console.log(`    - /api/auth/logout`);
 			console.log(`    - /api/chatrooms`);
 			console.log(`    - /api/chatrooms/:id`);
+			console.log(`  - Socket.IO server initialized`);
 		});
 
 		/**

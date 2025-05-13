@@ -10,14 +10,14 @@
  * - server.ts handles server startup, database connection, and graceful shutdown
  */
 
-import express from 'express';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
-import dotenv from 'dotenv';
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
 
 // Import routes
-import authRoutes from './routes/auth';
-import chatroomRoutes from './routes/chatrooms';
+import authRoutes from "./routes/auth";
+import chatroomRoutes from "./routes/chatrooms";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -47,23 +47,19 @@ const app = express();
  * hosted on different domains to interact with the API.
  */
 app.use(
-  cors({
-    // Allow requests from both localhost:5173 and null origin (file:// URLs)
-    origin: function (origin, callback) {
-      const allowedOrigins = [
-        'http://localhost:5173',
-        'https://gamersz-ldf-bd-mg-lucio-della-felices-projects.vercel.app/',
-        'https://gamersz-ldf-bd-mg.vercel.app',
-      ];
-      // Allow requests with no origin (like mobile apps, curl, etc)
-      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    credentials: true,
-  })
+	cors({
+		// Allow requests from both localhost:5173 and null origin (file:// URLs)
+		origin: function (origin, callback) {
+			const allowedOrigins = ["http://localhost:5173", "null"];
+			// Allow requests with no origin (like mobile apps, curl, etc)
+			if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+				callback(null, true);
+			} else {
+				callback(new Error("Not allowed by CORS"));
+			}
+		},
+		credentials: true,
+	})
 );
 
 /**
@@ -102,7 +98,7 @@ app.use(cookieParser());
  * Handles user registration, login, and logout.
  * Base path: /api/auth
  */
-app.use('/api/auth', authRoutes);
+app.use("/api/auth", authRoutes);
 
 /**
  * Chatroom Routes
@@ -110,7 +106,7 @@ app.use('/api/auth', authRoutes);
  * Base path: /api/chatrooms
  * These routes are protected by authentication middleware.
  */
-app.use('/api/chatrooms', chatroomRoutes);
+app.use("/api/chatrooms", chatroomRoutes);
 
 // Note: Health check endpoint is defined in server.ts
 
