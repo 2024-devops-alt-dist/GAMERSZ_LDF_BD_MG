@@ -53,6 +53,7 @@ app.use(
       const allowedOrigins = [
         'http://localhost:5173',
         "'https://gamersz-ldf-bd-mg.vercel.app'",
+        'https://gamersz-ldf-bd-mg-git-develop-lucio-della-felices-projects.vercel.app',
       ];
       // Allow requests with no origin (like mobile apps, curl, etc)
       if (!origin || allowedOrigins.indexOf(origin) !== -1) {
